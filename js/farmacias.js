@@ -1,18 +1,3 @@
-/** 
- * Extrae los valores del array 
- */
-let nombres = farmacias.map(farmacia => farmacia.NOMBRE);
-const telefonos = farmacias.map(farmacia => farmacia.TELEFONO);
-const mapaY = farmacias.map(farmacia => farmacia.GRAD_Y);
-const mapaX = farmacias.map(farmacia => farmacia.GRAD_X);
-const getUrl = farmacias.map(farmacia => farmacia.WEB);
-const direccion = farmacias.map(farmacia => farmacia.DIRECCION);
-var barrios = farmacias.map(farmacia => farmacia.BARRIO);
-const distritos = farmacias.map(farmacia => farmacia.DISTRITO);
-const entreSemana = farmacias.map(farmacia => farmacia.LUNES);
-const sabado = farmacias.map(farmacia => farmacia.SABADO);
-const domingo = farmacias.map(farmacia => farmacia.DOMINGO);
-
 //creacion del container
 let divContainer = document.createElement("div");
 divContainer.className = "container";
@@ -81,118 +66,123 @@ divContainer.appendChild(divRows);
 
 document.body.appendChild(divContainer);
 
-/**  
- * Recorre el array del JSON
- * Imprime las cards y sus componentes 
- */
-function printCards() {
-    for (let i = 0; i < farmacias.length; i++) {
-
-        //creacion columnas
-        let divCols = document.createElement("div");
-        divCols.className = "col-4";
-        divRows.appendChild(divCols);
-
-        //creacion cards
-        let divCards = document.createElement("div");
-        divCards.className = "card m-1";
-        divCols.appendChild(divCards);
-
-        //creacion distrito
-        let headerDistrito = document.createElement("div");
-        headerDistrito.className = "card-header text-white bg-dark distrito";
-        headerDistrito.id = "headerDistrito";
-        headerDistrito.innerHTML = "Distrito: " + distritos[i];
-        divCards.appendChild(headerDistrito);
-
-        //crecion de card header - barrios
-        let headerBarrio = document.createElement("div");
-        headerBarrio.className = "card-header text-white bg-secondary barrio";
-        headerBarrio.id = "headerBarrio";
-        headerBarrio.setAttribute("color", "primary");
-        headerBarrio.innerHTML = "Barrio: " + barrios[i];
-        divCards.appendChild(headerBarrio);
-
-        //creacion card body
-        let divCardsBody = document.createElement("div");
-        divCardsBody.className = "card-body";
-        divCards.appendChild(divCardsBody);
-
-        //creacion card title - nombres
-        let cardTitle = document.createElement("h5");
-        cardTitle.id = "tituloFarmacia";
-        cardTitle.className = "card-title";
-        cardTitle.innerHTML = nombres[i];
-        divCardsBody.appendChild(cardTitle);
-
-        //creacion list-group (ul)
-        let listGroup = document.createElement("ul");
-        listGroup.className = "list-group list-group-flush";
-        divCards.appendChild(listGroup);
-
-        //creacion horario
-        let cardText = document.createElement("p");
-        cardText.className = "card-text";
-        cardText.innerHTML = "<small>L-V: " + entreSemana[i].replace(/,/g, ' ')
-            + "<br/>Sabado: " + sabado[i].replace(/,/g, ' ')
-            + "<br/>Domingo: " + domingo[i].replace(/,/g, ' ') + "</small>";
-        divCardsBody.appendChild(cardText);
-
-        //creacion list-group-item (li) - telefonos
-        let listGroupItem1 = document.createElement("li");
-        listGroupItem1.className = "list-group-item";
-        listGroupItem1.innerHTML = telefonos[i];
-        listGroup.appendChild(listGroupItem1);
-
-        //creacion list-group-item (li) - direccion
-        let listGroupItem2 = document.createElement("li");
-        listGroupItem2.className = "list-group-item";
-        listGroupItem2.innerHTML = direccion[i];
-        listGroup.appendChild(listGroupItem2);
-
-        //creacion footer
-        let cardFooter = document.createElement("div");
-        cardFooter.className = "card-footer";
-        divCards.appendChild(cardFooter);
-
-        //creacion enlace a mapa
-        //https://maps.google.com/maps?daddr=28.8357,-14.23423
-        let linkMapa = document.createElement("a");
-        let linkTextoMapa = document.createTextNode(" Como llegar ");
-
-        //icono mapa
-        let iconoMapa = document.createElement("i");
-        iconoMapa.className = "fas fa-map-marker-alt";
-        linkMapa.appendChild(iconoMapa);
-
-        linkMapa.appendChild(linkTextoMapa);
-        linkMapa.href = "https://maps.google.com/maps?daddr=" + mapaY[i] + "," + mapaX[i];
-        linkMapa.setAttribute("target", "_blank");
-        cardFooter.appendChild(linkMapa);
-
-        //creacion enlace a web
-        if (getUrl[i] == undefined) {
-
-        } else {
-            var linkWeb = document.createElement("a");
-            var linkTextoWeb = document.createTextNode(" Web");
-
-            var iconoWeb = document.createElement("i");
-            iconoWeb.className = "fas fa-globe";
-            linkWeb.appendChild(iconoWeb);
-
-            linkWeb.appendChild(linkTextoWeb);
-            linkWeb.setAttribute("href", getUrl[i]);
-            linkWeb.setAttribute("target", "_blank");
-            cardFooter.appendChild(linkWeb);
-        }
+//get data
+const getData = async () => {
+    const response = await fetch('js/farmacias.json')
+    if (response.status === 200) {
+        return response.json()
+    } else {
+        throw new Error('error al obtener datos')
     }
 }
-printCards();
 
-//parametro para buscar
-var miDistrito = document.getElementById("headerDistrito").className;
-var miBarrio = document.getElementById("headerBarrio").className;
+const displayData = (callback) => {
+    getData().then(response => {
+        let data = response.docs;
+        data.map(farmacia => {
+            //creacion columnas
+            let divCols = document.createElement("div");
+            divCols.className = "col-4";
+            divRows.appendChild(divCols);
+
+            //creacion cards
+            let divCards = document.createElement("div");
+            divCards.className = "card m-1";
+            divCols.appendChild(divCards);
+
+            //creacion distrito
+            let headerDistrito = document.createElement("div");
+            headerDistrito.className = "card-header text-white bg-dark distrito";
+            headerDistrito.id = "headerDistrito";
+            headerDistrito.innerHTML = "Distrito: " + farmacia.DISTRITO;
+            divCards.appendChild(headerDistrito);
+
+            //crecion de card header - barrios
+            let headerBarrio = document.createElement("div");
+            headerBarrio.className = "card-header text-white bg-secondary barrio";
+            headerBarrio.id = "headerBarrio";
+            headerBarrio.setAttribute("color", "primary");
+            headerBarrio.innerHTML = "Barrio: " + farmacia.BARRIO;
+            divCards.appendChild(headerBarrio);
+
+            //creacion card body
+            let divCardsBody = document.createElement("div");
+            divCardsBody.className = "card-body";
+            divCards.appendChild(divCardsBody);
+
+            //creacion card title - nombres
+            let cardTitle = document.createElement("h5");
+            cardTitle.id = "tituloFarmacia";
+            cardTitle.className = "card-title";
+            cardTitle.innerHTML = farmacia.NOMBRE;
+            divCardsBody.appendChild(cardTitle);
+
+            //creacion list-group (ul)
+            let listGroup = document.createElement("ul");
+            listGroup.className = "list-group list-group-flush";
+            divCards.appendChild(listGroup);
+
+            //creacion horario
+            let cardText = document.createElement("p");
+            cardText.className = "card-text";
+            cardText.innerHTML = "<small>L-V: " + farmacia.LUNES.replace(/,/g, ' ')
+            + "<br/>Sabado: " + farmacia.SABADO.replace(/,/g, ' ')
+                + "<br/>Domingo: " + farmacia.DOMINGO.replace(/,/g, ' ') + "</small>";
+            divCardsBody.appendChild(cardText);
+
+            //creacion list-group-item (li) - telefonos
+            let listGroupItem1 = document.createElement("li");
+            listGroupItem1.className = "list-group-item";
+            listGroupItem1.innerHTML = farmacia.TELEFONO;
+            listGroup.appendChild(listGroupItem1);
+
+            //creacion list-group-item (li) - direccion
+            let listGroupItem2 = document.createElement("li");
+            listGroupItem2.className = "list-group-item";
+            listGroupItem2.innerHTML = farmacia.DIRECCION;
+            listGroup.appendChild(listGroupItem2);
+
+            //creacion footer
+            let cardFooter = document.createElement("div");
+            cardFooter.className = "card-footer";
+            divCards.appendChild(cardFooter);
+
+            //creacion enlace a mapa
+            //https://maps.google.com/maps?daddr=28.8357,-14.23423
+            let linkMapa = document.createElement("a");
+            let linkTextoMapa = document.createTextNode(" Como llegar ");
+
+            //icono mapa
+            let iconoMapa = document.createElement("i");
+            iconoMapa.className = "fas fa-map-marker-alt";
+            linkMapa.appendChild(iconoMapa);
+
+            linkMapa.appendChild(linkTextoMapa);
+            linkMapa.href = "https://maps.google.com/maps?daddr=" + farmacia.GRAD_Y + "," + farmacia.GRAD_X;
+            linkMapa.setAttribute("target", "_blank");
+            cardFooter.appendChild(linkMapa);
+
+            //creacion enlace a web
+            if (farmacia.WEB == undefined) {
+
+            } else {
+                var linkWeb = document.createElement("a");
+                var linkTextoWeb = document.createTextNode(" Web");
+
+                var iconoWeb = document.createElement("i");
+                iconoWeb.className = "fas fa-globe";
+                linkWeb.appendChild(iconoWeb);
+
+                linkWeb.appendChild(linkTextoWeb);
+                linkWeb.setAttribute("href", farmacia.WEB);
+                linkWeb.setAttribute("target", "_blank");
+                cardFooter.appendChild(linkWeb);
+            }
+
+            callback();
+        });
+    });
+}
 
 /** 
  * Implementacion de filtro y busqueda
@@ -240,5 +230,12 @@ function cambiarTexto() {
         }
     };
 }
-//por defecto busca por barrio
-buscar(miBarrio);
+
+displayData(() => {
+    //parametros para buscar
+    miDistrito = document.getElementById("headerDistrito").className;
+    miBarrio = document.getElementById("headerBarrio").className;
+    
+    //por defecto busca por barrio
+    buscar(miBarrio);
+});
